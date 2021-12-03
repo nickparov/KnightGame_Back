@@ -129,7 +129,7 @@ function seed(numOfEntities = 3) {
         
         // seed the db with users
         for(let i = 0; i < numOfEntities; i++) {
-            const query = DBConfig.users.queries.insert(`test${i}`, hashPass(`test${i}`), 100);
+            const query = DBConfig.users.queries.insert(`test${i}`, hashPass(`test${i}`), 3000);
             // db.run(query);
             runQ(query).then((res) => {
                 if(!res.success) console.error(res.err);
