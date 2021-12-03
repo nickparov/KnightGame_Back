@@ -13,21 +13,21 @@ const Items = {
 }
 
 async function fetchAll() {
-    const res = await fetch(`${storageApiRoute}`);
+    const res = await fetch(`${storageApiRoute}/items`);
     const data = await res.json();
 
     return data;
 }
 
 async function fetchItem(id) {
-    const res = await fetch(`${storageApiRoute}/${id}`);
+    const res = await fetch(`${storageApiRoute}/items/${id}`);
     const data = await res.json();
 
     return data;
 }
 
 async function fetchRandomItem() {
-    const res = await fetch(`${storageApiRoute}/random`);
+    const res = await fetch(`${storageApiRoute}/items/random`);
     const data = await res.json();
 
     return data;

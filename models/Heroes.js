@@ -14,21 +14,21 @@ const Heroes = {
 }
 
 async function fetchAll() {
-    const res = await fetch(`${storageApiRoute}`);
+    const res = await fetch(`${storageApiRoute}/heroes`);
     const data = await res.json();
 
     return data;
 }
 
 async function fetchHero(id) {
-    const res = await fetch(`${storageApiRoute}/${id}`);
+    const res = await fetch(`${storageApiRoute}/heroes/${id}`);
     const data = await res.json();
 
     return data;
 }
 
 async function fetchRandomHero() {
-    const res = await fetch(`${storageApiRoute}/random`);
+    const res = await fetch(`${storageApiRoute}/heroes/random`);
     const data = await res.json();
 
     return data;
