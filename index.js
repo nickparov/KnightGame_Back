@@ -27,7 +27,7 @@ const {
 
 // create express instance
 const app = express()
-const port = IS_DEV() === true ? 3000 : 80;
+const port = process.env.PORT || 8080;
 
 // CORS
 app.use(cors())
