@@ -1,5 +1,6 @@
 const fetch = require('node-fetch');
 const { DBConfig, allQ, runQ } = require('../DB');
+const { storageApiRoute } = require('../misc');
 
 
 const Items = {
@@ -12,21 +13,21 @@ const Items = {
 }
 
 async function fetchAll() {
-    const res = await fetch("http://localhost:3001/items");
+    const res = await fetch(`${storageApiRoute}`);
     const data = await res.json();
 
     return data;
 }
 
 async function fetchItem(id) {
-    const res = await fetch(`http://localhost:3001/items/${id}`);
+    const res = await fetch(`${storageApiRoute}/${id}`);
     const data = await res.json();
 
     return data;
 }
 
 async function fetchRandomItem() {
-    const res = await fetch(`http://localhost:3001/items/random`);
+    const res = await fetch(`${storageApiRoute}/random`);
     const data = await res.json();
 
     return data;

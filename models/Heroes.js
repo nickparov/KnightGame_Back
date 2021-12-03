@@ -1,5 +1,7 @@
 const fetch = require('node-fetch');
+const { IS_DEV } = require('../controllers/Environment');
 const { DBConfig, allQ, runQ, showAllRows } = require('../DB');
+const { storageApiRoute } = require('../misc');
 const { getAdventureByHero } = require('./Adventure');
 
 const Heroes = {
@@ -12,21 +14,21 @@ const Heroes = {
 }
 
 async function fetchAll() {
-    const res = await fetch("http://localhost:3001/heroes");
+    const res = await fetch(`${storageApiRoute}`);
     const data = await res.json();
 
     return data;
 }
 
 async function fetchHero(id) {
-    const res = await fetch(`http://localhost:3001/heroes/${id}`);
+    const res = await fetch(`${storageApiRoute}/${id}`);
     const data = await res.json();
 
     return data;
 }
 
 async function fetchRandomHero() {
-    const res = await fetch(`http://localhost:3001/heroes/random`);
+    const res = await fetch(`${storageApiRoute}/random`);
     const data = await res.json();
 
     return data;
