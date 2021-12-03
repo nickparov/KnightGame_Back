@@ -1,4 +1,4 @@
 /node_modules
 /public/*
-/prod
 /dev
+prod/assets/background.mp4
