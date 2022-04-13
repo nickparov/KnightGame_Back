@@ -1,0 +1,2 @@
+* Replace all redirects with json responses (code 200) and body that contains redirect link. [DONE]
+* On the front, see if it has redirect present in the body, if it has -> redirect programmaticaly, if not -> just proceed as usual [DONE]

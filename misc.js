@@ -11,5 +11,6 @@ module.exports = {
         return Math.round(Date.now() / 1000);
     },
     generateRandNum : (min, max) => Math.floor(Math.random() * max) + min,
-    storageApiRoute : IS_DEV() ? "http://localhost:3001" : "https://knight-game-storage-1.herokuapp.com"
+    storageApiRoute : IS_DEV() ? "http://localhost:3001" : "https://knight-game-storage-1.herokuapp.com",
+    resDataObj: class {constructor(err = null, d = null) {this.error = err; this.d = d}}
 }

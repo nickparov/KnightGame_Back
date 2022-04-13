@@ -11,7 +11,7 @@ const Profile = {
 
 async function delete_(req, res) {
     await removeSession(req.cookies.sessionID);
-    await removeUser(req.sessionData.username);
+    await removeUser(req.sessionData.id);
     res.json({ redirectUrl: "/auth" });
 }
 

@@ -1,5 +1,5 @@
 const { DBConfig, allQ, showAllRows, runQ } = require("../DB");
-const { _jsonError, getNowSeconds, generateRandNum } = require("../misc");
+const { _jsonError, getNowSeconds, generateRandNum, resDataObj } = require("../misc");
 const { fetchUserHeroes, fetchHero, updateUserHero, giveUserHero } = require("../models/Heroes");
 const { fetchUserItemsIds, fetchItem, fetchRandomItem, deleteItemById, saveUserItem, deleteUserItemById } = require("../models/Items");
 const { updateUserMoney, getUser, userExists } = require("../models/Users");
@@ -22,7 +22,6 @@ const Game = {
     getRandomHeroes,
     buyUserHero
 }
-
 
 async function getRandomHeroes(req, res) {
     let num = null;
@@ -64,12 +63,12 @@ async function getRandomItems(req, res) {
 }
 
 async function sellUserItem(req, res) {
-    // TODO: add bool whole process success flag
     // on back 
     const { db_id, record_id } = req.body;
     const user_id = req.sessionData.id;
     // get: price of the item <- get from storage api
     const itemData = await fetchItem(record_id);
+    // if item found Okay  
     const itemPrice = itemData.price;
     // get user money
     const userData = await getUser(user_id);
@@ -82,12 +81,12 @@ async function sellUserItem(req, res) {
     res.json(deleteRes);
 }
 async function buyUserItem(req, res) {
-    // TODO: add bool whole process success flag
     // on back 
     const { record_id } = req.body;
     const user_id = req.sessionData.id;
     // get: price of the item <- get from storage api
     const itemData = await fetchItem(record_id);
+
     const itemPrice = itemData.price;
     // get user money
     const userData = await getUser(user_id);
@@ -95,6 +94,7 @@ async function buyUserItem(req, res) {
 
     let updateMoneyRes = false;
     let saveUserRes = false;
+
     // see if user has enough money to buy it
     if(userMoney - itemPrice >= 0) {
         // buy it
@@ -103,12 +103,12 @@ async function buyUserItem(req, res) {
         // add to user arsenal
         saveUserRes = await Items.saveUserItem(user_id, record_id);
     } 
+
     // bool 
     res.json({success:updateMoneyRes && saveUserRes});
 }
 
 async function buyUserHero(req, res) {
-    // TODO: add bool whole process success flag
     // on back 
     const { hero_id } = req.body;
     const user_id = req.sessionData.id;
@@ -138,6 +138,7 @@ async function getUserItems(req, res) {
     // const fetchRes = await fetchUserItemsIds(1);
     if(!fetchRes.success) res.json(_jsonError("Db issue!"));
     const { data } = fetchRes;
+
     const itemsData = await Promise.all(data.map(async ({ id, item_id }) => {
         const itemData = await fetchItem(item_id);
         return {
@@ -146,13 +147,13 @@ async function getUserItems(req, res) {
             db_id: id
         }
     }));
+
     res.json(itemsData);
 }
 
 async function getUserHeroes(req, res) {
 
     const fetchRes = await fetchUserHeroes(req.sessionData.id);
-    // const fetchRes = await fetchUserHeroes(1);
 
     if(!fetchRes.success) res.json(_jsonError("Db issue!"));
 
@@ -174,12 +175,17 @@ async function getUserHeroes(req, res) {
 }   
 
 async function sendUserHero(req, res) {
-    // TODO Get user_id from req.sessionData
-    const { user_id, hero_record_id } = req.body;
+    // TODO remove user_id from body on front 
+    const { hero_record_id } = req.body;
+    const user_id = req.sessionData.id;
     // update hero record using hero model
     // hero is in adventure
     let uptRes = await updateUserHero(user_id, hero_record_id, 0);
-    // TODO Check uptRes for errors
+    if(!uptRes) {
+        // TODO check if works
+        res.json(_jsonError("Error while updating hero status!"));
+        return;
+    }
     // create adventure record
     // generate future timestamp
     const currSeconds = getNowSeconds();
@@ -195,9 +201,6 @@ async function sendUserHero(req, res) {
     const advData = await getAdventureByHero(hero_record_id);
     // return this new adventure data
     res.json(advData);
-    return;
-
-    showAllRows("items");
 }
 
 async function claimUserHero(req, res) {
@@ -218,12 +221,13 @@ async function claimUserHero(req, res) {
         
         // save & check item save
         const itemSaved = await saveUserItem(user_id, response.data.item.id);
-        if(!itemSaved) 
+        if(!itemSaved.success) 
             response.success = false;
     } 
 
     if(generateRandNum(0, 101) > 50) {
         response.data.gold = generateRandNum(5, 30);
+
         // get current user balance
         const { money } = await getUser(user_id);
         // update user money
@@ -234,11 +238,14 @@ async function claimUserHero(req, res) {
     const wasUpdated = await updateUserHero(user_id, hero_record_id, 1);
     if(!wasUpdated) 
         response.success = false;
+    
 
     // check delete adventure
     const wasDeleted = await deleteAdventureByHero(hero_record_id);
+
     if(!wasDeleted) 
         response.success = false;
+
 
     res.json(response);
 }

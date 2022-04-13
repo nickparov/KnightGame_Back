@@ -1,4 +1,6 @@
 /node_modules
 /public/*
 /dev
+/database
 prod/assets/background.mp4
+database/main.db

@@ -6,7 +6,10 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 
-const { IS_DEV } = require("./controllers/Environment");
+// Env
+const { DIRNAME } = require("./controllers/Environment");
+const ENVIRONMENT_DIRECTORY = DIRNAME();
+
 
 // Middlewares
 const { 
@@ -14,6 +17,25 @@ const {
 } = require('./middlewares');
 
 
+// TODO move to other place
+// async function tryCatchFatherAsync(fn) {
+//     return async (req, res) => {
+//         try {
+//             await fn(req, res);
+//         } catch(err) {
+//             res.json({error: err})
+//         }
+//     }
+// }
+
+// async function setupTryCatch(controllerObjArr) {
+//     for (ctrlObj of controllerObjArr) {
+//         // go through each method in controller and wrap into try catch 
+//         for(ctrlMethodKey of Object.keys(ctrlObj) ) {
+//             ctrlObj[ctrlMethodKey] = await tryCatchFatherAsync(ctrlObj[ctrlMethodKey]);
+//         }
+//     }
+// }
 
 // Controllers
 const {
@@ -22,8 +44,11 @@ const {
     Game
 } = require("./controllers/export");
 
-
-
+// Controllers try catch wrap. 
+// TODO Check to work
+// (async function() {
+//     await setupTryCatch([ Auth, Profile, Game ]);
+// })();
 
 // create express instance
 const app = express()
@@ -41,6 +66,8 @@ app.use(passport.initialize());
 
 const { userExists, getUser } = require("./models/Users");
 const { checkPass } = require("./models/Pass");
+
+
 
 // check auth form middleware
 passport.use(new LocalStrategy(
@@ -101,6 +128,7 @@ const ItemsModel = require("./models/Items");
         const data = await ItemsModel.fetchAll();
         res.json(data.slice(0, 10));
     })
+
     // HEROES
     // fetchHero
     // app.get('/heroes/:id', async (req, res) => {
@@ -112,13 +140,14 @@ const ItemsModel = require("./models/Items");
 
 // Home 
 app.get('/', SessionMiddleware, (req, res) => {
-  res.sendFile(path.join(__dirname + `/${IS_DEV() ? "dev" : "prod"}/index.html`));
+  res.sendFile(path.join(__dirname + `/${ENVIRONMENT_DIRECTORY}/index.html`));
 });
 
-// For serving static files 
-console.log("IS_DEV: ", process.env.NODE_ENV.includes("development"))
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname + `/${ENVIRONMENT_DIRECTORY}/auth.html`));
+})
 
-app.use(express.static(path.join(__dirname, IS_DEV() ? "dev" : "prod")));
+app.use(express.static(path.join(__dirname, ENVIRONMENT_DIRECTORY)));
 
 // 404 redirect
 // app.get("*", (req, res) => {

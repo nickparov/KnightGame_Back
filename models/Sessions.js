@@ -45,7 +45,7 @@ async function createSession(username, secondsToExpire) {
     // 300000 is default val for seconds
     // generate secs to give val to expires_at
     const expires_at =  getNowSeconds() + secondsToExpire;
-    // TODO: HIDE SALT
+    // TODO: HIDE SALT into .env file
     const salt = "PeakyBlinders";
     const saltedUsername = `${salt}${username}`;
     const sessionID = crypto.createHash("sha256").update(saltedUsername).digest('hex');

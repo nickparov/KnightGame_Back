@@ -18,21 +18,22 @@ const Auth = {
 async function index(req, res) {
     const sessionID = req.cookies.sessionID; 
     
-    // check if session is already in place
-    if(await sessionExists(sessionID)) {
+    // check if session exists
+    if(await sessionExists(sessionID) === true) {
+        // TODO getSessionUsername place await before it
         req.sessionData = await getUser(getSessionUsername(sessionID));
         res.redirect("/");
     } 
     // if no session is present 
     else {
-        // TODO: change to redirect to /auth and process it in index.js
-        res.sendFile(path.join(__dirname + `/../${IS_DEV() ? "dev" : "prod"}/auth.html`));
+        // TODO: redirect CHANGED CHECK IF WORKS
+        res.redirect("/login");
     }
 };
 
 async function login(req, res) {
     // set new session id associated with username
-    const sessionID = await createSession(req.body.username, 60*30); // 30 mins
+    const sessionID = await createSession(req.body.username, 10);
     // set cookie
     res.cookie("sessionID", sessionID, { maxAge: 1000 * 60 * 60 * 24 * 30 }); // 30 days
     // send response

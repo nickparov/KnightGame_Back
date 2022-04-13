@@ -17,6 +17,7 @@ const DBConfig = {
             insert: (id, user_id, expires_at = "NULL") => `INSERT INTO sessions(id, user_id, expires_at) VALUES('${id}', '${user_id}', '${expires_at}');`,
             getById: (id) => `SELECT * FROM sessions WHERE id = '${id}';`,
             deleteById: (id) => `DELETE FROM sessions WHERE id = '${id}';`,
+            deleteAllByUserId: (user_id) => `DELETE FROM sessions WHERE user_id = '${user_id}';`,
         }
     },
     users: {
@@ -46,6 +47,7 @@ const DBConfig = {
             getByUserId: (user_id) => `SELECT * FROM heroes WHERE user_id = ${user_id};`,
             deleteById: (id) => `DELETE FROM heroes WHERE id = ${id};`,
             updateAvailabilityById: (id, user_id, is_available) => `UPDATE heroes SET is_available='${is_available}' WHERE id = ${id} AND user_id = ${user_id};`,
+            deleteAllByUserId: (user_id) => `DELETE FROM heroes WHERE user_id = ${user_id};`,
         }
     },
     items: {
@@ -58,6 +60,7 @@ const DBConfig = {
             insert: (user_id, item_id) => `INSERT INTO items(user_id, item_id) VALUES('${user_id}', '${item_id}');`,
             getByUserId: (user_id) => `SELECT * FROM items WHERE user_id = ${user_id};`,
             deleteById: (id) => `DELETE FROM items WHERE id = ${id};`,
+            deleteAllByUserId: (user_id) => `DELETE FROM items WHERE user_id = ${user_id};`,
         }
     },
     adventures: {
@@ -66,6 +69,7 @@ const DBConfig = {
             insert: (hero_id, date_val) => `INSERT INTO adventures(hero_id, date) VALUES('${hero_id}', '${date_val}');`,
             getByHeroId: (hero_id) => `SELECT * FROM adventures WHERE hero_id = ${hero_id};`,
             deleteByHeroId: (hero_id) => `DELETE FROM adventures WHERE hero_id = ${hero_id};`,
+            deleteAllByUserId: (user_id) => `DELETE FROM adventures WHERE user_id = ${user_id};`,
         }
     }
 }
@@ -180,9 +184,16 @@ function seed(numOfEntities = 3) {
     if(equals(seededTables, tables)) 
         seed();
     
-    showAllRows("sessions");
+    
 })();
 
+async function userCascadeDelete(user_id) {
+    for(tableKey of Object.keys(DBConfig)) {
+        if(DBConfig[tableKey].hasOwnProperty("deleteAllByUserId")) {
+            await runQ(DBConfig[tableKey].deleteAllByUserId(user_id));
+        }
+    }
+}
 
 // db.close(dbErrHandler);
 
@@ -192,5 +203,6 @@ module.exports = {
     runQ,
     allQ,
     fatherQ,
-    showAllRows
+    showAllRows,
+    userCascadeDelete
 };

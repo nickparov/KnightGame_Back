@@ -21,7 +21,7 @@ async function fetchAll() {
 
 async function fetchItem(id) {
     const res = await fetch(`${storageApiRoute}/items/${id}`);
-    const data = await res.json();
+    const { data } = await res.json();
 
     return data;
 }
@@ -38,6 +38,7 @@ async function fetchUserItemsIds(user_id) {
     const q = DBConfig.items.queries.getByUserId(user_id);
     const userItemsIds = await allQ(q);
 
+
     return userItemsIds;
 }
 
@@ -48,17 +49,12 @@ async function deleteUserItemById(item_id) {
     return deleteRes;
 }
 
-
+ 
 async function saveUserItem(user_id, item_id) {
     const saveItemQuery = DBConfig.items.queries.insert(user_id, item_id);
     const saveQRes = await runQ(saveItemQuery);
 
-    if(!saveQRes.success) {
-        console.log(saveQRes.err);
-        return false;
-    }
-    // TODO return result of query
-    return true;
+    return saveQRes;
 }
 
 

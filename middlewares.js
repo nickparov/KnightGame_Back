@@ -3,12 +3,26 @@ const { sessionExists, getSessionUsername, getSession, removeSession, createSess
 const { getUser } = require("./models/Users");
 
 
+function redirectHandler(req, res, url) {
+    isJsonReq = req.is('application/json') === 'application/json';
+    // AJAX
+    if(isJsonReq) {
+        res.json({redirect: url});
+    } else {
+        // HTML or ELSE
+        res.redirect(url);
+    }
+    
+}
+
 // check session
 async function SessionMiddleware(req, res, next) {
     var sessionID = req.cookies.sessionID;
-    
+
+    console.log()
+
     if(!sessionID) {
-        res.redirect("/auth");
+        redirectHandler(req, res, "/login")
     } 
     else {
         // if such sessionid DO EXISTS
@@ -22,7 +36,8 @@ async function SessionMiddleware(req, res, next) {
             if(nowSeconds >= recordSeconds) {
                 // remove old session
                 await removeSession(sessionID);
-                res.redirect("/auth");
+                redirectHandler(req, res, "/login")
+
             } else {
                 const sessionUsername = await getSessionUsername(sessionID);
                 // append user data to req
@@ -31,7 +46,7 @@ async function SessionMiddleware(req, res, next) {
             }
         } // if no such sessionid 
         else {
-            res.redirect("/auth");
+            redirectHandler(req, res, "/login")
         }
     }
 }

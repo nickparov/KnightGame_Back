@@ -1,4 +1,4 @@
-const { DBConfig, runQ, getQ } = require("../DB");
+const { DBConfig, runQ, getQ, userCascadeDelete } = require("../DB");
 const { hashPass } = require("./Pass");
 
 const Users = {
@@ -33,14 +33,15 @@ async function updateUsername(oldUsername, newUsername) {
     return qRes.success;
 }
 
-//TODO change argument from username to id 
-async function removeUser(username) {
+async function removeUser(user_id) {
     const { deleteById } = DBConfig.users.queries;
 
-    const { id } = await getUser(username);
-    const res = await runQ(deleteById(id));
-    // TODO: Do cascading delete on all related models
+    const res = await runQ(deleteById(user_id));
+
     if(!res.success) console.error(res.err);
+
+    // Cascade delete all user related models
+    await userCascadeDelete(user_id);
 }
 
 async function getUser(needle) {

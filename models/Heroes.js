@@ -59,8 +59,8 @@ async function updateUserHero(user_id, hero_record_id, is_available) {
 async function giveUserHero(user_id, hero_record_id) {
     const insertQ = DBConfig.heroes.queries.insert(user_id, hero_record_id);
     const insertQRes = await runQ(insertQ);
-    // TODO check for insert QRes
-    return true;
+
+    return insertQRes.success;
 }
 
 module.exports = Heroes;
