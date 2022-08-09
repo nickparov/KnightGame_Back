@@ -33,7 +33,7 @@ async function index(req, res) {
 
 async function login(req, res) {
     // set new session id associated with username
-    const sessionID = await createSession(req.body.username, 10);
+    const sessionID = await createSession(req.body.username, 180);
     // set cookie
     res.cookie("sessionID", sessionID, { maxAge: 1000 * 60 * 60 * 24 * 30 }); // 30 days
     // send response
